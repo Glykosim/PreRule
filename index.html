@@ -1,292 +1,351 @@
-<!DOCTYPE html>
-<html lang="nb">
+<!doctype html>
+<html lang="no">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Et enkelt verktøy for å planlegge og beskrive algoritmer steg for steg.">
-  <title>Algoritmehjelp Verktøy</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PreRule – algoritmehjelp for TnI</title>
   <style>
-    :root {
-      color-scheme: light;
-      --bg: #f6f7f9;
-      --panel: #ffffff;
-      --text: #1f2937;
-      --muted: #667085;
-      --line: #d0d5dd;
-      --accent: #2563eb;
-      --accent-dark: #1d4ed8;
-      --danger: #b42318;
-      --shadow: 0 12px 30px rgb(16 24 40 / 10%);
+    :root{
+      --bg:#f6f8fb;
+      --panel:#ffffff;
+      --text:#172033;
+      --muted:#64748b;
+      --line:#d8e0ea;
+      --red:#e92b1d;
+      --red-soft:#fff0ee;
+      --yellow:#f7b500;
+      --yellow-soft:#fff8dc;
+      --green:#76b947;
+      --green-soft:#f1fae8;
+      --blue:#2563eb;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:18px;
     }
-
-    * {
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg,#fff 0%,var(--bg) 45%,#eef3f8 100%);
+      color:var(--text);
+      line-height:1.45;
     }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.5;
+    header{
+      padding:28px 18px 18px;
+      max-width:1180px;
+      margin:auto;
     }
-
-    header {
-      background: var(--panel);
-      border-bottom: 1px solid var(--line);
-      padding: 24px clamp(16px, 4vw, 48px);
+    h1{font-size:clamp(1.6rem,3vw,2.55rem); margin:0 0 8px; letter-spacing:-.03em}
+    .lead{max-width:850px;color:var(--muted);font-size:1.05rem;margin:0}
+    .app{
+      max-width:1180px;
+      margin:0 auto 40px;
+      padding:0 18px 28px;
+      display:grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px,.85fr);
+      gap:18px;
     }
-
-    header h1 {
-      margin: 0 0 6px;
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
+    @media (max-width:900px){.app{grid-template-columns:1fr}.sticky{position:static!important}}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
     }
-
-    header p {
-      margin: 0;
-      color: var(--muted);
-      max-width: 760px;
+    .card h2{font-size:1.15rem;margin:0;padding:18px 18px 12px;border-bottom:1px solid var(--line)}
+    .content{padding:18px}
+    .step{
+      border:1px solid var(--line);
+      border-radius:16px;
+      margin-bottom:14px;
+      overflow:hidden;
+      background:#fff;
     }
-
-    main {
-      display: grid;
-      grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
-      gap: 24px;
-      width: min(1180px, 100%);
-      margin: 0 auto;
-      padding: 24px clamp(16px, 4vw, 48px);
+    .step-title{
+      display:flex;gap:12px;align-items:flex-start;
+      padding:14px 14px 10px;
+      font-weight:750;
     }
-
-    section {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      padding: 20px;
+    .num{
+      width:30px;height:30px;border-radius:999px;background:#e8eef7;color:#1e3a8a;
+      display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:800;
     }
-
-    h2 {
-      margin: 0 0 16px;
-      font-size: 1.25rem;
+    .hint{display:block;color:var(--muted);font-weight:500;font-size:.93rem;margin-top:2px}
+    .options{display:grid;gap:10px;padding:0 14px 14px}
+    label.option{
+      display:flex;gap:10px;align-items:flex-start;
+      border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:#fbfdff;
+      transition:.15s ease;
     }
-
-    label {
-      display: block;
-      margin: 14px 0 6px;
-      font-weight: 700;
+    label.option:hover{border-color:#9db4d6;transform:translateY(-1px)}
+    input[type="radio"], input[type="checkbox"]{margin-top:3px; transform:scale(1.15)}
+    .sub{font-size:.92rem;color:var(--muted);margin-top:2px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:620px){.grid2{grid-template-columns:1fr}}
+    .fields{display:grid;gap:12px;padding:0 14px 14px}
+    input[type="number"], input[type="text"], select, textarea{
+      width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font:inherit;background:#fff;
     }
-
-    input,
-    select,
-    textarea,
-    button {
-      font: inherit;
+    textarea{min-height:90px;resize:vertical}
+    .small-label{font-weight:700;font-size:.92rem;margin-bottom:5px;display:block}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;padding:0 18px 18px}
+    button{
+      border:0;border-radius:12px;padding:11px 14px;font-weight:750;cursor:pointer;font:inherit;
+      background:#172033;color:#fff;box-shadow:0 6px 18px rgba(15,23,42,.12);
     }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 10px 12px;
-      background: #ffffff;
-      color: var(--text);
+    button.secondary{background:#e8eef7;color:#1e293b;box-shadow:none}
+    button.ghost{background:#fff;color:#1e293b;border:1px solid var(--line);box-shadow:none}
+    .sticky{position:sticky;top:16px}
+    .result{
+      border-radius:18px;padding:18px;border:2px solid var(--line);background:#fff;
     }
-
-    textarea {
-      min-height: 110px;
-      resize: vertical;
+    .result.red{border-color:var(--red);background:var(--red-soft)}
+    .result.yellow{border-color:var(--yellow);background:var(--yellow-soft)}
+    .result.green{border-color:var(--green);background:var(--green-soft)}
+    .badge{display:inline-flex;align-items:center;gap:8px;font-weight:850;border-radius:999px;padding:7px 10px;margin-bottom:10px}
+    .red .badge{background:var(--red);color:#fff}.yellow .badge{background:var(--yellow);color:#2b2100}.green .badge{background:var(--green);color:#102600}
+    .decision{font-size:1.45rem;font-weight:850;letter-spacing:-.02em;margin:4px 0 8px}
+    .explain{margin:0;color:#1f2937}
+    .checklist{padding-left:20px;margin:12px 0 0}.checklist li{margin:5px 0}
+    .summary-box{margin-top:14px;border-top:1px solid rgba(0,0,0,.12);padding-top:12px;font-size:.95rem;color:#374151;white-space:pre-wrap}
+    .warn{
+      background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:13px;margin-top:14px;color:#7c2d12;font-size:.94rem;
     }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
+    .flow{
+      display:grid;gap:10px;margin-top:14px;
     }
-
-    button {
-      border: 0;
-      border-radius: 6px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .primary {
-      background: var(--accent);
-      color: #ffffff;
-    }
-
-    .primary:hover {
-      background: var(--accent-dark);
-    }
-
-    .secondary {
-      background: #eef2ff;
-      color: var(--accent-dark);
-    }
-
-    .danger {
-      background: #fee4e2;
-      color: var(--danger);
-    }
-
-    .output {
-      min-height: 460px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .empty {
-      color: var(--muted);
-    }
-
-    @media (max-width: 840px) {
-      main {
-        grid-template-columns: 1fr;
-      }
+    .flowbox{border-radius:14px;padding:12px;border:1px solid var(--line);background:#fff;font-weight:650}
+    .flowbox.red{background:var(--red);color:#fff;border-color:var(--red)}
+    .flowbox.yellow{background:var(--yellow);color:#2b2100;border-color:#d69b00}
+    .flowbox.green{background:var(--green);color:#102600;border-color:#609c37}
+    .arrow{text-align:center;color:var(--muted);font-weight:900;margin:-2px 0}
+    details{border-top:1px solid var(--line);padding:14px 18px;background:#fbfdff}
+    summary{cursor:pointer;font-weight:800}
+    .tiny{font-size:.85rem;color:var(--muted)}
+    .hidden{display:none!important}
+    @media print{
+      body{background:#fff}.app{display:block}.card{box-shadow:none;margin-bottom:14px}.actions,.no-print{display:none}.sticky{position:static}.result{break-inside:avoid}
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Algoritmehjelp Verktøy</h1>
-    <p>Lag en tydelig algoritme med mål, input, prosess og forventet output.</p>
-  </header>
+<header>
+  <h1>PreRule – algoritmehjelp for TnI på legevakt/ambulanse</h1>
+  <p class="lead">Interaktiv støtte for pasienter der EKG er tatt og man vurderer behov for innleggelse, TnI-testing eller videre differensialdiagnostisk utredning.</p>
+</header>
 
-  <main>
-    <section aria-labelledby="form-title">
-      <h2 id="form-title">Bygg algoritmen</h2>
-      <form id="algorithm-form">
-        <label for="title">Navn på algoritme</label>
-        <input id="title" name="title" type="text" placeholder="For eksempel: Finn største tall">
-
-        <label for="goal">Mål</label>
-        <textarea id="goal" name="goal" placeholder="Hva skal algoritmen løse?"></textarea>
-
-        <label for="input">Input</label>
-        <textarea id="input" name="input" placeholder="Hvilke data trenger algoritmen?"></textarea>
-
-        <label for="steps">Steg</label>
-        <textarea id="steps" name="steps" placeholder="Skriv ett steg per linje"></textarea>
-
-        <label for="output">Output</label>
-        <textarea id="output" name="output" placeholder="Hva skal algoritmen returnere eller vise?"></textarea>
-
-        <label for="format">Format</label>
-        <select id="format" name="format">
-          <option value="tekst">Forklaring</option>
-          <option value="pseudokode">Pseudokode</option>
-          <option value="sjekkliste">Sjekkliste</option>
-        </select>
-
-        <div class="actions">
-          <button class="primary" type="submit">Generer</button>
-          <button class="secondary" id="copy-button" type="button">Kopier</button>
-          <button class="danger" id="reset-button" type="reset">Tøm</button>
+<main class="app">
+  <section class="card" aria-label="Algoritmeskjema">
+    <h2>Vurdering</h2>
+    <div class="content">
+      <div class="step">
+        <div class="step-title"><span class="num">1</span><div>Er pasienten åpenbart innleggelsestrengende?<span class="hint">Velg ja ved STEMI/tydelig ny iskemi, alvorlig arytmi, klinisk ustabilitet eller annen tilstand som trenger akutt innleggelse.</span></div></div>
+        <div class="options">
+          <label class="option"><input type="radio" name="admit_now" value="yes"><div><strong>Ja</strong><div class="sub">Akutt innleggelse uten å vente på TnI.</div></div></label>
+          <label class="option"><input type="radio" name="admit_now" value="no"><div><strong>Nei</strong><div class="sub">Gå videre og vurder om koronarsykdom er usikker/mulig.</div></div></label>
         </div>
-      </form>
-    </section>
+      </div>
 
-    <section aria-labelledby="result-title">
-      <h2 id="result-title">Resultat</h2>
-      <div id="result" class="output empty">Fyll ut feltene og trykk Generer.</div>
-    </section>
-  </main>
+      <div class="step" id="reasonStep">
+        <div class="step-title"><span class="num">2</span><div>Hvorfor vurderes TnI?<span class="hint">TnI er mest aktuell ved usikker koronarsykdom, ikke når klinikk og sykehistorie allerede forklarer tilstanden.</span></div></div>
+        <div class="options">
+          <label class="option"><input type="radio" name="risk_context" value="uncertain"><div><strong>Usikker mtp koronarsykdom – ta TnI</strong><div class="sub">Symptomer uten risikofaktorer, uklare symptomer med risikofaktorer, eller kjent koronarsykdom med lite symptomer/klinikk.</div></div></label>
+          <label class="option"><input type="radio" name="risk_context" value="not_indicated"><div><strong>Ikke ta TnI</strong><div class="sub">Klinikk og sykehistorie gir diagnose som kan behandles prehospitalt/ved legevakt.</div></div></label>
+        </div>
+      </div>
 
-  <script>
-    const form = document.querySelector("#algorithm-form");
-    const result = document.querySelector("#result");
-    const copyButton = document.querySelector("#copy-button");
+      <div class="step" id="tniStep">
+        <div class="step-title"><span class="num">3</span><div>TnI-resultat og symptomdebut<span class="hint">Bruk lokale analysegrenser. Gråsone eller kort tid fra symptomdebut gir ny TnI etter 1 time og klinisk revurdering.</span></div></div>
+        <div class="fields">
+          <div class="grid2">
+            <div><label class="small-label" for="tniValue">TnI-verdi (valgfritt)</label><input id="tniValue" type="number" step="0.1" placeholder="f.eks. 7.5"></div>
+            <div><label class="small-label" for="hoursSince">Timer siden symptomdebut</label><input id="hoursSince" type="number" step="0.25" min="0" placeholder="f.eks. 3"></div>
+          </div>
+          <div class="grid2">
+            <div><label class="small-label" for="lowLimit">Risikogrense lav / rule-out</label><input id="lowLimit" type="number" step="0.1" placeholder="lokal grense"></div>
+            <div><label class="small-label" for="highLimit">Risikogrense høy / rule-in</label><input id="highLimit" type="number" step="0.1" placeholder="lokal grense"></div>
+          </div>
+          <div>
+            <label class="small-label" for="manualTni">Manuell kategori</label>
+            <select id="manualTni">
+              <option value="unknown">Ikke vurdert / bruk tall over</option>
+              <option value="below">TnI under risikogrense</option>
+              <option value="grey">TnI i gråsone</option>
+              <option value="above">TnI over risikogrense</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-    function listSteps(value, prefix) {
-      const steps = value
-        .split("\n")
-        .map((step) => step.trim())
-        .filter(Boolean);
+      <div class="step">
+        <div class="step-title"><span class="num">4</span><div>Differensialdiagnoser som ikke må overses<span class="hint">Kryss av som huskeliste. Dette styrer ikke alene konklusjonen, men tas med i sammendraget.</span></div></div>
+        <div class="options grid2">
+          <label class="option"><input type="checkbox" class="diff" value="Ustabil angina kan foreligge selv ved normal troponin"><div>Ustabil angina <div class="sub">Normal TnI utelukker ikke.</div></div></label>
+          <label class="option"><input type="checkbox" class="diff" value="Lungeemboli"><div>Lungeemboli</div></label>
+          <label class="option"><input type="checkbox" class="diff" value="Aortadisseksjon"><div>Aortadisseksjon</div></label>
+          <label class="option"><input type="checkbox" class="diff" value="Pneumoni"><div>Pneumoni</div></label>
+          <label class="option"><input type="checkbox" class="diff" value="Gallestein"><div>Gallestein</div></label>
+          <label class="option"><input type="checkbox" class="diff" value="Pneumothorax"><div>Pneumothorax</div></label>
+        </div>
+      </div>
 
-      if (steps.length === 0) {
-        return `${prefix} Ingen steg lagt inn.`;
-      }
+      <div class="step">
+        <div class="step-title"><span class="num">5</span><div>Notat til vurderingen<span class="hint">Valgfritt. Tas med når du kopierer sammendrag.</span></div></div>
+        <div class="fields"><textarea id="notes" placeholder="Kort klinisk vurdering, EKG-funn, risikofaktorer, plan …"></textarea></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="copyBtn" type="button">Kopier sammendrag</button>
+      <button id="printBtn" type="button" class="secondary">Skriv ut</button>
+      <button id="resetBtn" type="button" class="ghost">Nullstill</button>
+    </div>
+    <details>
+      <summary>Om verktøyet</summary>
+      <p>Dette er et lokalt beslutningsstøtteverktøy basert på PreRule-flyten: EKG → behov for innleggelse → vurdering av usikker koronarsykdom → TnI-kategori → videre plan. Det erstatter ikke klinisk vurdering, lokale prosedyrer eller ansvarlig lege/ambulansepersonell.</p>
+      <p class="tiny">Tips: Skriv inn lokale TnI-grenser dersom verktøyet skal kategorisere tallverdi automatisk. Uten grenser brukes manuell kategori.</p>
+    </details>
+  </section>
 
-      return steps
-        .map((step, index) => `${prefix} ${index + 1}. ${step}`)
-        .join("\n");
+  <aside class="card sticky" aria-live="polite">
+    <h2>Forslag fra algoritmen</h2>
+    <div class="content">
+      <div id="result" class="result">
+        <span class="badge">Venter på vurdering</span>
+        <div class="decision">Fyll ut punkt 1–3</div>
+        <p class="explain">Resultatet oppdateres automatisk.</p>
+      </div>
+      <div class="flow no-print" id="flowPreview"></div>
+      <div class="warn"><strong>Husk:</strong> Ved klinisk ustabilitet, tydelig ny iskemi/STEMI, alvorlig arytmi eller annen akutt innleggelsestrengende tilstand skal pasienten innlegges uavhengig av TnI.</div>
+    </div>
+  </aside>
+</main>
+
+<script>
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+  function radio(name){ return document.querySelector(`input[name="${name}"]:checked`)?.value || null; }
+  function n(id){ const v = parseFloat($(id).value.replace?.(',', '.') ?? $(id).value); return Number.isFinite(v) ? v : null; }
+  function selectedDiff(){ return $$('.diff:checked').map(x => x.value); }
+
+  function tniCategory(){
+    const manual = $('#manualTni').value;
+    const hours = n('#hoursSince');
+    if(manual !== 'unknown') return manual;
+    const tni = n('#tniValue'), low = n('#lowLimit'), high = n('#highLimit');
+    if(tni === null || low === null || high === null) return 'unknown';
+    if(tni >= high) return 'above';
+    if(tni < low && (hours === null || hours >= 2)) return 'below';
+    return 'grey';
+  }
+
+  function categoryText(cat){
+    return ({
+      below:'TnI under risikogrense',
+      grey:'TnI i gråsone eller <2 t siden symptomdebut',
+      above:'TnI over risikogrense',
+      unknown:'TnI ikke kategorisert'
+    })[cat];
+  }
+
+  function makeDecision(){
+    const admit = radio('admit_now');
+    const context = radio('risk_context');
+    const cat = tniCategory();
+    const hours = n('#hoursSince');
+    const shortOnset = hours !== null && hours < 2;
+
+    if(admit === 'yes'){
+      return {
+        color:'red', badge:'Akutt innleggelse', title:'Innleggelse i sykehus',
+        text:'Pasienten har funn/tilstand som tilsier innleggelse uten å vente på TnI.',
+        bullets:['STEMI eller tydelig ny iskemi', 'Alvorlig arytmi', 'Klinisk ustabil', 'Annen tilstand som trenger akutt innleggelse']
+      };
     }
-
-    function fieldValue(name) {
-      const value = new FormData(form).get(name);
-      return String(value || "").trim();
+    if(admit === null){
+      return {color:'', badge:'Venter på vurdering', title:'Start med innleggelsesbehov', text:'Avklar først om pasienten er åpenbart innleggelsestrengende.', bullets:[]};
     }
-
-    function generateText() {
-      const title = fieldValue("title") || "Uten navn";
-      const goal = fieldValue("goal") || "Ikke beskrevet";
-      const input = fieldValue("input") || "Ikke beskrevet";
-      const steps = fieldValue("steps");
-      const output = fieldValue("output") || "Ikke beskrevet";
-      const format = fieldValue("format");
-
-      if (format === "pseudokode") {
-        return [
-          `ALGORITME ${title}`,
-          `MAL: ${goal}`,
-          `INPUT: ${input}`,
-          "STEG:",
-          listSteps(steps, ""),
-          `OUTPUT: ${output}`,
-          "SLUTT"
-        ].join("\n");
-      }
-
-      if (format === "sjekkliste") {
-        return [
-          `Sjekkliste: ${title}`,
-          `[ ] Mål: ${goal}`,
-          `[ ] Input: ${input}`,
-          listSteps(steps, "[ ]"),
-          `[ ] Output: ${output}`
-        ].join("\n");
-      }
-
-      return [
-        `Algoritme: ${title}`,
-        "",
-        `Mål: ${goal}`,
-        `Input: ${input}`,
-        "",
-        "Steg:",
-        listSteps(steps, ""),
-        "",
-        `Output: ${output}`
-      ].join("\n");
+    if(context === 'not_indicated'){
+      return {
+        color:'green', badge:'TnI ikke indisert', title:'Utredning/behandling mtp differensialdiagnoser',
+        text:'Klinikk og sykehistorie gir annen sannsynlig diagnose som kan håndteres prehospitalt eller på legevakt.',
+        bullets:['Vurder og dokumenter relevante differensialdiagnoser', 'Gi sikkerhetsnett/retur-råd etter lokal praksis']
+      };
     }
+    if(context === null){
+      return {color:'', badge:'Venter på vurdering', title:'Avklar om koronarsykdom er usikker', text:'Velg om TnI er aktuell fordi koronarsykdom ikke kan avklares klinisk.', bullets:[]};
+    }
+    if(cat === 'above'){
+      return {color:'red', badge:'TnI over risikogrense', title:'Innleggelse i sykehus', text:'TnI er over risikogrense. Vurder innleggelse i sykehus i lys av klinikk og EKG.', bullets:['Kontakt/henvis etter lokal prosedyre', 'Vurder samtidige differensialdiagnoser ved atypisk bilde']};
+    }
+    if(cat === 'grey' || shortOnset){
+      return {color:'yellow', badge:'Gråsone / tidlig prøve', title:'Ny TnI etter 1 time + klinisk revurdering', text:'TnI er i gråsone eller symptomdebut er under 2 timer. Videre håndtering avhenger av klinikk.', bullets:['Ny TnI etter 1 time', 'Revurder EKG, symptomer og risikofaktorer', 'Vurder differensialdiagnoser før eventuell hjemsendelse']};
+    }
+    if(cat === 'below'){
+      return {color:'green', badge:'TnI under risikogrense', title:'Utredning mtp differensialdiagnoser', text:'TnI er under risikogrense. Videre plan styres av klinikk og differensialdiagnoser.', bullets:['Normal/lav TnI utelukker ikke ustabil angina', 'Gi sikkerhetsnett ved utskrivelse', 'Vurder annen årsak til symptomer']};
+    }
+    return {color:'', badge:'TnI mangler', title:'Legg inn TnI-kategori eller grenser', text:'Velg manuell TnI-kategori eller legg inn TnI-verdi og lokale grenser.', bullets:[]};
+  }
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      result.textContent = generateText();
-      result.classList.remove("empty");
-    });
+  function summaryText(decision){
+    const admit = radio('admit_now');
+    const context = radio('risk_context');
+    const cat = tniCategory();
+    const diffs = selectedDiff();
+    const notes = $('#notes').value.trim();
+    const parts = [];
+    parts.push(`PreRule algoritmehjelp – ${new Date().toLocaleString('no-NO')}`);
+    parts.push(`Konklusjon: ${decision.title}`);
+    parts.push(`Begrunnelse: ${decision.text}`);
+    parts.push(`Innleggelse åpenbart nødvendig: ${admit === 'yes' ? 'Ja' : admit === 'no' ? 'Nei' : 'Ikke valgt'}`);
+    parts.push(`Kontekst: ${context === 'uncertain' ? 'Usikker mtp koronarsykdom / TnI aktuell' : context === 'not_indicated' ? 'Klinikk/sykehistorie tilsier annen diagnose / TnI ikke indisert' : 'Ikke valgt'}`);
+    parts.push(`TnI: ${categoryText(cat)}${n('#tniValue') !== null ? ` (verdi ${n('#tniValue')})` : ''}${n('#hoursSince') !== null ? `, symptomdebut ${n('#hoursSince')} t` : ''}`);
+    if(diffs.length) parts.push(`Differensialdiagnoser vurdert/husket: ${diffs.join('; ')}`);
+    if(notes) parts.push(`Notat: ${notes}`);
+    return parts.join('\n');
+  }
 
-    form.addEventListener("reset", () => {
-      result.textContent = "Fyll ut feltene og trykk Generer.";
-      result.classList.add("empty");
-    });
+  function render(){
+    const decision = makeDecision();
+    const r = $('#result');
+    r.className = `result ${decision.color}`.trim();
+    r.innerHTML = `
+      <span class="badge">${decision.badge}</span>
+      <div class="decision">${decision.title}</div>
+      <p class="explain">${decision.text}</p>
+      ${decision.bullets.length ? `<ul class="checklist">${decision.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''}
+      <div class="summary-box">${summaryText(decision)}</div>`;
+    renderFlow(decision);
+  }
 
-    copyButton.addEventListener("click", async () => {
-      if (result.classList.contains("empty")) {
-        return;
-      }
+  function renderFlow(decision){
+    const admit = radio('admit_now');
+    const context = radio('risk_context');
+    const cat = tniCategory();
+    const boxes = [];
+    boxes.push(`<div class="flowbox">EKG tatt → trenger pasienten innleggelse?</div>`);
+    if(admit === 'yes') boxes.push(`<div class="arrow">↓</div><div class="flowbox red">JA → Innleggelse i sykehus</div>`);
+    if(admit === 'no'){
+      boxes.push(`<div class="arrow">↓</div><div class="flowbox">NEI → vurder usikker koronarsykdom</div>`);
+      if(context === 'uncertain') boxes.push(`<div class="arrow">↓</div><div class="flowbox yellow">Ta TnI → ${categoryText(cat)}</div>`);
+      if(context === 'not_indicated') boxes.push(`<div class="arrow">↓</div><div class="flowbox green">Ikke ta TnI → utredning/behandling mtp differensialdiagnoser</div>`);
+      if(cat === 'above') boxes.push(`<div class="arrow">↓</div><div class="flowbox red">Innleggelse i sykehus</div>`);
+      if(cat === 'grey') boxes.push(`<div class="arrow">↓</div><div class="flowbox yellow">Ny TnI etter 1 time + revurdering</div>`);
+      if(cat === 'below') boxes.push(`<div class="arrow">↓</div><div class="flowbox green">Utredning mtp differensialdiagnoser</div>`);
+    }
+    $('#flowPreview').innerHTML = boxes.join('');
+  }
 
-      await navigator.clipboard.writeText(result.textContent);
-      copyButton.textContent = "Kopiert";
-      setTimeout(() => {
-        copyButton.textContent = "Kopier";
-      }, 1200);
-    });
-  </script>
+  document.addEventListener('input', render);
+  document.addEventListener('change', render);
+  $('#resetBtn').addEventListener('click', () => { document.querySelector('form')?.reset(); $$('input').forEach(i=>{ if(i.type==='radio'||i.type==='checkbox') i.checked=false; else i.value=''; }); $('#manualTni').value='unknown'; $('#notes').value=''; render(); });
+  $('#printBtn').addEventListener('click', () => window.print());
+  $('#copyBtn').addEventListener('click', async () => {
+    const txt = summaryText(makeDecision());
+    try{ await navigator.clipboard.writeText(txt); $('#copyBtn').textContent='Kopiert'; setTimeout(()=>$('#copyBtn').textContent='Kopier sammendrag',1300); }
+    catch(e){ alert(txt); }
+  });
+  render();
+</script>
 </body>
 </html>
